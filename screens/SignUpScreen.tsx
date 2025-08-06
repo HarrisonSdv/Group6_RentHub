@@ -1,8 +1,9 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { collection, addDoc, doc, getDocs, query, where } from "firebase/firestore";
 import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { firebaseAuth } from '../config/FirebaseConfig';
+import { firebaseAuth, FirebaseDB } from '../config/FirebaseConfig';
 
 const SignUpScreen: React.FC<NativeStackScreenProps<any>> = ({ navigation }) => {
 
@@ -12,17 +13,65 @@ const SignUpScreen: React.FC<NativeStackScreenProps<any>> = ({ navigation }) => 
         error: ''
     });
 
-    async function onSignUp() {
+    async function onSignUpClient() {
         if (userObject.email === "" || userObject.password === "") {
             setUserObject({ ...userObject, error: "Email and Password is mandatory!" });
             return;
         }
 
         try {
+            const clientRef = collection(FirebaseDB, "Users");
+            const q = query(clientRef, where("email", "==", userObject.email), where("type", "==", "Client"));
+            const querySnapshot = await getDocs(q);
+            
+            if (!querySnapshot.empty) {
+                setUserObject({ ...userObject, error: "A client with this email already exists." });
+                return;
+            }
+            
             await createUserWithEmailAndPassword(firebaseAuth, userObject.email, userObject.password)
-                .then((result) => {
-                    Alert.alert("User Created Successfully!", `Welcome ${result.user.email}`)
+                .then(async (result) => {
+                    await addDoc(clientRef, {
+                        email: userObject.email,
+                        password: userObject.password,
+                        id: result.user.uid,
+                        type: "Client"
+                    });
+                    navigation.navigate('ClientHome');
                 })
+        } catch (err) {
+            console.log(err);
+            setUserObject({ ...userObject, error: `${err.message}` });
+        }
+    }
+
+    async function onSignUpLandlord() {
+        if (userObject.email === "" || userObject.password === "") {
+            setUserObject({ ...userObject, error: "Email and Password is mandatory!" });
+            return;
+        }
+
+        try {
+            const landlordsRef = collection(FirebaseDB, "Users");
+            const q = query(landlordsRef, where("email", "==", userObject.email), where("type", "==", "Landlord"));
+            const querySnapshot = await getDocs(q);
+            
+            if (!querySnapshot.empty) {
+                setUserObject({ ...userObject, error: "A landlord with this email already exists." });
+                return;
+            }
+
+            // If email doesn't exist, proceed with account creation
+            await createUserWithEmailAndPassword(firebaseAuth, userObject.email, userObject.password)
+                .then(async (result) => {
+                    await addDoc(landlordsRef, {
+                        email: userObject.email,
+                        password: userObject.password, 
+                        id: result.user.uid,
+                        type: "Landlord"
+                    });
+                    navigation.navigate('LandlordHome');
+                });
         } catch (err) {
             console.log(err);
             setUserObject({ ...userObject, error: `${err.message}` });
@@ -60,9 +109,14 @@ const SignUpScreen: React.FC<NativeStackScreenProps<any>> = ({ navigation }) => 
                 </View>
             }
 
-            <TouchableOpacity style={styles.buttonStyle} onPress={onSignUp}>
-                <Text style={styles.buttonText}>SignUp</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.buttonStyle} onPress={onSignUpClient}>
+                    <Text style={styles.buttonText}>Client Sign Up</Text>
+                </TouchableOpacity>
+                    <TouchableOpacity style={styles.buttonStyle} onPress={onSignUpLandlord}>
+                    <Text style={styles.buttonText}>Landlord Sign Up</Text>
+                </TouchableOpacity>
+            </View>
         </View>
     );
 }
@@ -84,11 +138,18 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         width: '90%'
     },
+    buttonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 10,
+        gap: 15,
+    },
     buttonStyle: {
         marginVertical: 10,
         alignItems: "center",
         justifyContent: "center",
-        width: "75%",
+        width: "45%",
         height: 45,
         borderRadius: 5,
         backgroundColor: "#10ac84",

@@ -1,8 +1,9 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { collection, getDocs, query, where } from "firebase/firestore";
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert } from 'react-native';
-import { firebaseAuth } from '../config/FirebaseConfig';
+import { firebaseAuth, FirebaseDB } from '../config/FirebaseConfig';
 
 const SignInScreen: React.FC<NativeStackScreenProps<any>> = ({ navigation }) => {
 
@@ -12,16 +13,51 @@ const SignInScreen: React.FC<NativeStackScreenProps<any>> = ({ navigation }) => 
         error: ''
     });
 
-    async function onSignIn() {
+    async function onSignInClient() {
         if (userObject.email === "" || userObject.password === "") {
             setUserObject({ ...userObject, error: "Email and Password is mandatory!" });
             return;
         }
 
         try {
+            const usersRef = collection(FirebaseDB, "Users");
+            const q = query(usersRef, where("email", "==", userObject.email), where("type", "==", "Client"));
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                setUserObject({ ...userObject, error: "No client found with this email." });
+                return;
+            }
+        
             await signInWithEmailAndPassword(firebaseAuth, userObject.email, userObject.password)
-                .then((result) => {
-                    Alert.alert("SignIn Successful!", `Welcome ${result.user.email}`)
+                .then(() => {
+                    navigation.navigate('ClientHome');
+                })
+        } catch (err) {
+            console.log(err);
+            setUserObject({ ...userObject, error: `${err.message}` });
+        }
+    }
+
+    async function onSignInLandlord() {
+        if (userObject.email === "" || userObject.password === "") {
+            setUserObject({ ...userObject, error: "Email and Password is mandatory!" });
+            return;
+        }
+
+        try {
+            const usersRef = collection(FirebaseDB, "Users");
+            const q = query(usersRef, where("email", "==", userObject.email), where("type", "==", "Landlord"));
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                setUserObject({ ...userObject, error: "No landlord found with this email." });
+                return;
+            }
+        
+            await signInWithEmailAndPassword(firebaseAuth, userObject.email, userObject.password)
+                .then(() => {
+                    navigation.navigate('LandlordHome');
                 })
         } catch (err) {
             console.log(err);
@@ -60,13 +96,18 @@ const SignInScreen: React.FC<NativeStackScreenProps<any>> = ({ navigation }) => 
                 </View>
             }
 
-            <TouchableOpacity style={styles.buttonStyle} onPress={onSignIn}>
-                <Text style={styles.buttonText}>SignIn</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity style={styles.buttonStyle} onPress={onSignInClient}>
+                    <Text style={styles.buttonText}>Client Sign In</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.buttonStyle} onPress={onSignInLandlord}>
+                    <Text style={styles.buttonText}>Landlord Sign In</Text>
+                </TouchableOpacity>
+            </View>
 
             <TouchableOpacity style={[styles.buttonStyle, { marginTop: 'auto', marginBottom: 50 }]}
                 onPress={() => { navigation.navigate("SignUpScreen") }} >
-                <Text style={styles.buttonText}>SignUp</Text>
+                <Text style={styles.buttonText}>Sign Up</Text>
             </TouchableOpacity>
         </View>
     );
@@ -89,11 +130,18 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         width: '90%'
     },
+    buttonContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 10,
+        gap: 15,
+    },
     buttonStyle: {
         marginVertical: 10,
         alignItems: "center",
         justifyContent: "center",
-        width: "75%",
+        width: "45%",
         height: 45,
         borderRadius: 5,
         backgroundColor: "#10ac84",
