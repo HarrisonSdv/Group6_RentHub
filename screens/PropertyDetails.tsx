@@ -1,6 +1,5 @@
 import React from "react";
 import { View, Text, StyleSheet, Button } from "react-native";
-import { getAuth } from "firebase/auth";
 
 export default function PropertyDetails({ navigation }: any) {
 	return (
