@@ -7,6 +7,7 @@ export default function PropertyDetails({ navigation }: any) {
 			<Text style={styles.title}>Property Name</Text>
 			<Text style={styles.subtitle}>Property Description</Text>
 			<Text style={styles.price}>$555</Text>
+			<Text style={styles.location}>Location</Text>
 		</View>
 	);
 }
@@ -31,6 +32,9 @@ const styles = StyleSheet.create({
 	price: {
 		fontWeight: "bold",
 		fontSize: 16,
+	},
+	location: {
+		fontSize: 14,
 	},
 	buttonContainer: {
 		width: "100%",

@@ -11,6 +11,7 @@ import { ActivityIndicator, View } from "react-native";
 type RootStackParamList = {
 	ClientHome: undefined;
 	LandlordHome: undefined;
+	PropertyDetails: undefined;
 	Loading: undefined;
 };
 
