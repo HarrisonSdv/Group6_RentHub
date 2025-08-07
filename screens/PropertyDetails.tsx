@@ -8,6 +8,11 @@ export default function PropertyDetails({ navigation }: any) {
 			<Text style={styles.subtitle}>Property Description</Text>
 			<Text style={styles.price}>$555</Text>
 			<Text style={styles.location}>Location</Text>
+
+			<View style={styles.buttonContainer}>
+				<Button title="Shortlist" />
+				<Button title="Send Request" />
+			</View>
 		</View>
 	);
 }
