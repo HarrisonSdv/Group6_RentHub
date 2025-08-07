@@ -1,16 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
-import { getAuth } from 'firebase/auth';
 
 export default function LandlordHomeScreen({ navigation }: any) {
-  const handleSignOut = async () => {
-    try {
-      const auth = getAuth();
-      await auth.signOut();
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -18,7 +9,7 @@ export default function LandlordHomeScreen({ navigation }: any) {
       <Text style={styles.subtitle}>You're viewing the landlord dashboard.</Text>
       
       <View style={styles.buttonContainer}>
-        <Button title="Sign Out" onPress={handleSignOut} />
+        <Button title="Property List" onPress={() => navigation.navigate('PropertyList' , { userType: 'landlord' })} />
       </View>
     </View>
   );

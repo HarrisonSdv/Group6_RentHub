@@ -30,9 +30,6 @@ const SignInScreen: React.FC<NativeStackScreenProps<any>> = ({ navigation }) => 
             }
         
             await signInWithEmailAndPassword(firebaseAuth, userObject.email, userObject.password)
-                .then(() => {
-                    navigation.navigate('ClientHome');
-                })
         } catch (err) {
             console.log(err);
             setUserObject({ ...userObject, error: `${err.message}` });
@@ -56,9 +53,6 @@ const SignInScreen: React.FC<NativeStackScreenProps<any>> = ({ navigation }) => 
             }
         
             await signInWithEmailAndPassword(firebaseAuth, userObject.email, userObject.password)
-                .then(() => {
-                    navigation.navigate('LandlordHome');
-                })
         } catch (err) {
             console.log(err);
             setUserObject({ ...userObject, error: `${err.message}` });

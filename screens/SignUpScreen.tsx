@@ -37,7 +37,6 @@ const SignUpScreen: React.FC<NativeStackScreenProps<any>> = ({ navigation }) => 
                         id: result.user.uid,
                         type: "Client"
                     });
-                    navigation.navigate('ClientHome');
                 })
         } catch (err) {
             console.log(err);
@@ -70,7 +69,6 @@ const SignUpScreen: React.FC<NativeStackScreenProps<any>> = ({ navigation }) => 
                         id: result.user.uid,
                         type: "Landlord"
                     });
-                    navigation.navigate('LandlordHome');
                 });
         } catch (err) {
             console.log(err);
