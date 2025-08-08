@@ -128,8 +128,18 @@ export default function PropertyDetails({}: any) {
 			</View>
 
 			<View style={styles.buttonContainer}>
-				<Button title="Shortlist" />
-				<Button title="Send Request" />
+				<Button
+					title="Shortlist"
+					onPress={() => {
+						Alert.alert("Shortlisted");
+					}}
+				/>
+				<Button
+					title="Send Request"
+					onPress={() => {
+						Alert.alert("Request Sent");
+					}}
+				/>
 			</View>
 		</View>
 	);
@@ -138,8 +148,6 @@ export default function PropertyDetails({}: any) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
 		padding: 20,
 	},
 	title: {
