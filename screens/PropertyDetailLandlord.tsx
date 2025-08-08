@@ -163,6 +163,10 @@ export default function PropertyDetailLandlord() {
             title="Edit property" 
             onPress={() => navigation.navigate('EditProperty', { propertyId: property.id })} 
           />
+		  <Button 
+            title="Check Request" 
+            onPress={() => navigation.navigate('LandlordCheckRequest', { propertyId: property.id })} 
+          />
         </View>
       )}
     </View>
@@ -180,7 +184,8 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     height: 200,
-    marginVertical: 20,
+    marginBottom: 10,
+    marginTop: 15,
     borderRadius: 10,
     overflow: 'hidden',
   },
@@ -188,7 +193,8 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   addressContainer: {
-    marginVertical: 20,
+    marginTop: 0,
+    marginBottom: 15,
     backgroundColor: '#f8f8f8',
     borderRadius: 10,
     padding: 15,
@@ -244,9 +250,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonContainer: {
-    marginTop: 20,
+    marginTop: 15,
+    marginBottom: 20,
     gap: 10,
-    width: "100%",
-    maxWidth: 200,
+    alignItems: 'center',
+    paddingHorizontal: 40,
   },
 });

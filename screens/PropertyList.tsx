@@ -16,6 +16,7 @@ type PropertyListProps = {
   route: {
     params: {
       userType: 'landlord' | 'client';
+      userOnly: boolean;
     };
   };
   navigation: any;
@@ -32,7 +33,7 @@ type Property = {
 };
 
 const PropertyList = ({ route, navigation }: PropertyListProps) => {
-  const { userType } = route.params;
+  const { userType, userOnly = false } = route.params;
   const [propertyList, setPropertyList] = useState<Property[]>([]);
   const [filteredList, setFilteredList] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,11 +54,17 @@ const PropertyList = ({ route, navigation }: PropertyListProps) => {
       setPropertyList(properties);
       
       // Filter properties: show all to owner, only listed to others
-      const filtered = properties.filter(property => 
-        (property.createdBy === currentUser?.uid) || property.listed !== false
-      );
-      
-      setFilteredList(filtered);
+      if (userType === 'landlord' && userOnly) {
+        const filtered = properties.filter(property => 
+          (property.createdBy === currentUser?.uid)
+        );
+        setFilteredList(filtered);
+      } else {
+        const filtered = properties.filter(property => 
+          property.listed !== false || (userType === 'landlord' && property.createdBy === currentUser?.uid)
+        );
+        setFilteredList(filtered);
+      }
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {

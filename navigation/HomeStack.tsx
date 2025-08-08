@@ -13,6 +13,7 @@ import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import AddProperty from "../screens/AddProperty";
 import EditProperty from "../screens/EditProperty";
+import LandlordCheckRequest from "../screens/LandlordCheckRequest";
 
 type RootStackParamList = {
   ClientHome: undefined;
@@ -119,6 +120,7 @@ const HomeStack = () => {
         <Stack.Screen name="PropertyDetailLandlord" component={PropertyDetailLandlord} options={{ title: "Property Details" }} />
         <Stack.Screen name="PropertyList" component={PropertyList} options={{ title: "Properties" }} />
         <Stack.Screen name="EditProperty" component={EditProperty} options={{ title: "Edit Property" }} />
+        <Stack.Screen name="LandlordCheckRequest" component={LandlordCheckRequest} options={{ title: "Check Request" }} />
 		</Stack.Navigator>
 	);
 };

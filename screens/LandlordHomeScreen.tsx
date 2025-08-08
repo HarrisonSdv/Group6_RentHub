@@ -10,6 +10,7 @@ export default function LandlordHomeScreen({ navigation }: any) {
       
       <View style={styles.buttonContainer}>
         <Button title="Property List" onPress={() => navigation.navigate('PropertyList' , { userType: 'landlord' })} />
+        <Button title="Check Your Property" onPress={() => navigation.navigate('PropertyList' , { userType: 'landlord', userOnly: true })} />
       </View>
     </View>
   );
