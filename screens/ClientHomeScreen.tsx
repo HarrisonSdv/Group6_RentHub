@@ -18,7 +18,7 @@ export default function ClientHomeScreen({ navigation }: any) {
 			<Text style={styles.subtitle}>You're viewing the client dashboard.</Text>
 
 			<View style={styles.buttonContainer}>
-				<Button title="View Property" onPress={() => navigation.navigate("PropertyDetails")} />
+				<Button title="View Properties" onPress={() => navigation.navigate("PropertyList")} />
 				<Button title="Sign Out" onPress={handleSignOut} />
 			</View>
 		</View>
