@@ -34,6 +34,10 @@ type Request = {
 	createdAt: any;
 	userId: string | undefined;
 };
+type Shortlist = {
+	userId: string | undefined;
+	propertyId: string | undefined;
+};
 
 export default function PropertyDetails({}: any) {
 	const navigation = useNavigation<any>();
@@ -80,10 +84,24 @@ export default function PropertyDetails({}: any) {
 	}, [fetchProperty, route.params?.refresh]);
 
 	const shortlist = useCallback(async () => {
+		const user = firebaseAuth.currentUser;
+		if (!user) {
+			Alert.alert("Error", "No logged in user");
+			return;
+		}
+		const [shortlist, setShortlist] = useState<Shortlist>({
+			propertyId: property?.id,
+			userId: user?.uid,
+		});
+		setLoading(true);
 		try {
+			await addDoc(collection(FirebaseDB, "shortlists"), { ...shortlist });
+			Alert.alert("Success", "Shortlisted!", [{ text: "OK", onPress: () => navigation.replace("PropertyDetails", { propertyId: property?.id }) }]);
 		} catch (error) {
 			console.error("Error shortlisting:", error);
 			Alert.alert("Error", "Failed to shortlist property");
+		} finally {
+			setLoading(false);
 		}
 	}, [route.params?.propertyId, auth.currentUser]);
 	const sendRequest = useCallback(async () => {
