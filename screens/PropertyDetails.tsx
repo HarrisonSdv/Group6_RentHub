@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { View, Text, StyleSheet, Button, Alert, ActivityIndicator } from "react-native";
 import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { FirebaseDB } from "../config/FirebaseConfig";
+import { addDoc, collection, doc, getDoc, serverTimestamp, updateDoc } from "firebase/firestore";
+import { FirebaseDB, firebaseAuth } from "../config/FirebaseConfig";
 import { getAuth } from "firebase/auth";
 import MapView, { Marker } from "react-native-maps";
 
@@ -27,6 +27,13 @@ interface Property {
 	updatedAt?: string;
 	createdAt?: string;
 }
+type Request = {
+	propertyId: string | undefined;
+	offeredPrice: number;
+	accepted: boolean | null; // null=pending true=accepted false=denied
+	createdAt: any;
+	userId: string | undefined;
+};
 
 export default function PropertyDetails({}: any) {
 	const navigation = useNavigation<any>();
@@ -71,6 +78,39 @@ export default function PropertyDetails({}: any) {
 	useEffect(() => {
 		fetchProperty();
 	}, [fetchProperty, route.params?.refresh]);
+
+	const shortlist = useCallback(async () => {
+		try {
+		} catch (error) {
+			console.error("Error shortlisting:", error);
+			Alert.alert("Error", "Failed to shortlist property");
+		}
+	}, [route.params?.propertyId, auth.currentUser]);
+	const sendRequest = useCallback(async () => {
+		const user = firebaseAuth.currentUser;
+		if (!user) {
+			Alert.alert("Error", "No logged in user");
+			return;
+		}
+
+		const [request, setRequest] = useState<Request>({
+			propertyId: property?.id,
+			offeredPrice: 0,
+			accepted: null, // null=pending true=accepted false=denied
+			createdAt: serverTimestamp(),
+			userId: user?.uid,
+		});
+		setLoading(true);
+		try {
+			await addDoc(collection(FirebaseDB, "requests"), { ...request });
+			Alert.alert("Success", "Request sent!", [{ text: "OK", onPress: () => navigation.replace("PropertyDetails", { propertyId: property?.id }) }]);
+		} catch (error) {
+			console.error("Error sending request:", error);
+			Alert.alert("Error", "Failed to send request");
+		} finally {
+			setLoading(false);
+		}
+	}, [route.params?.propertyId, auth.currentUser]);
 
 	if (loading) {
 		return (
@@ -131,13 +171,13 @@ export default function PropertyDetails({}: any) {
 				<Button
 					title="Shortlist"
 					onPress={() => {
-						Alert.alert("Shortlisted");
+						shortlist();
 					}}
 				/>
 				<Button
 					title="Send Request"
 					onPress={() => {
-						Alert.alert("Request Sent");
+						sendRequest();
 					}}
 				/>
 			</View>
